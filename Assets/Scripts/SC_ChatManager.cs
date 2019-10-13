@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -56,9 +54,10 @@ public class SC_ChatManager : MonoBehaviour
         //Добавление сообщений в интерфейс
         SC_BubbleMessageView _bubbleMessage = Instantiate(ownMessageGameObject, chatContainer)
             .GetComponent<SC_BubbleMessageView>();
-        //Проверка на повтор с предыдущим сообщением
+
         _bubbleMessage.SetData(_messageData, _chatRoom: _chatRoom);
         _currentMessages.Add(_messageData);
+        //Проверка на повтор с предыдущим сообщением
         CheckPreviousMessage(true);
     }
 

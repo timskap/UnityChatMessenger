@@ -14,7 +14,6 @@ public class SC_BubbleMessageView : MonoBehaviour
     [SerializeField] private Image avatar;
     [SerializeField] private Image backgroundBubbleImage;
     [SerializeField] private Sprite backgroundBubbleWithoutAvatarSprite;
-    [SerializeField] private Sprite backgroundBubbleSprite;
     [SerializeField] private HorizontalLayoutGroup containerHorizontalLayoutGroup;
     [SerializeField] private VerticalLayoutGroup containerVerticalLayoutGroup;
     [SerializeField] private Button removeButton;
