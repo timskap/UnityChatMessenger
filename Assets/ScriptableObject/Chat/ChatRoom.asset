@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5f93106e0c3e47a789a75fa8145930b, type: 3}
   m_Name: ChatRoom
   m_EditorClassIdentifier: Assembly-CSharp::ChatRoom
-  currentMessageId: 409
+  currentMessageId: 415
   hostId: 1
   _messages:
   - messageId: 401

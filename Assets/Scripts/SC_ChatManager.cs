@@ -6,6 +6,7 @@ using TMPro;
 using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class SC_ChatManager : MonoBehaviour
 {
@@ -23,14 +24,25 @@ public class SC_ChatManager : MonoBehaviour
 
     [SerializeField] private GameObject MessagePanelGameObject;
     [SerializeField] private GameObject RemovePanelGameObject;
+
+    [SerializeField] private bool isSlowLoad;
+    private List<Message> _currentMessages;
     
     private void Awake()
     {
+        _currentMessages = new List<Message>();
         _inputField.onSubmit.AddListener(AddMessage);
         _sendButton.onClick.AddListener(() => AddMessage(_inputField.text));
         _clearButton.onClick.AddListener(() => OpenRemovePanel(true));
         _doneButton.onClick.AddListener(() => OpenRemovePanel(false));
-        LoadHistory();
+        if (isSlowLoad)
+        {
+            StartCoroutine(SlowLoadHistory());
+        }
+        else
+        {
+            LoadHistory();
+        }
     }
     
     private void AddMessage(string messageText)
@@ -46,29 +58,56 @@ public class SC_ChatManager : MonoBehaviour
             .GetComponent<SC_BubbleMessageView>();
         //Проверка на повтор с предыдущим сообщением
         _bubbleMessage.SetData(_messageData, _chatRoom: _chatRoom);
-       
+        _currentMessages.Add(_messageData);
         CheckPreviousMessage(true);
     }
 
     private void CheckPreviousMessage(bool isOwnMessage = false)
-    {
-        GameObject previousMessage = chatContainer.Find(_chatRoom.LoadHistory()[_chatRoom.LoadHistory().Count - 2]?.messageId.ToString())?.gameObject;
-        Message previousMessageData = _chatRoom.LoadHistory()[_chatRoom.LoadHistory().Count - 2];
+    {    
+        if (_currentMessages.Count <= 1) return;
+        GameObject previousMessage = chatContainer.Find(_currentMessages[_currentMessages.Count - 2]?.messageId.ToString())?.gameObject;
+        Message previousMessageData = _currentMessages[_currentMessages.Count - 2];
 
         if (previousMessage == null) return;
         
-        if (_chatRoom.LoadHistory()?.LastOrDefault()?.user.userId ==
+        if (_currentMessages.LastOrDefault()?.user.userId ==
             previousMessageData.user.userId)
         {
-            previousMessage.GetComponent<SC_BubbleMessageView>().SetData(previousMessageData, true, isOwnMessage, _chatRoom);
+            previousMessage.GetComponent<SC_BubbleMessageView>().SetData(previousMessageData, true, isOwnMessage: isOwnMessage, _chatRoom);
+        }
+    }
+
+    IEnumerator SlowLoadHistory()
+    {   
+        //TODO: При загрузке истории, добавить еще одну проверку на стакинг сообщений
+        var _chatHistory = _chatRoom.LoadHistory();
+        foreach (var _message in _chatHistory)
+        {
+            _currentMessages.Add(_message);
+            yield return new WaitForSeconds(Random.Range(1f, 3f));
+            if (_message.user.userId == _chatRoom.hostId)
+            {
+                Instantiate(ownMessageGameObject, chatContainer)
+                    .GetComponent<SC_BubbleMessageView>()
+                    .SetData(_message,  _chatRoom: _chatRoom);
+                CheckPreviousMessage(true);
+            }
+            else
+            {
+                Instantiate(anotherMessageGameObject, chatContainer)
+                    .GetComponent<SC_BubbleMessageView>()
+                    .SetData(_message,  _chatRoom: _chatRoom);
+                CheckPreviousMessage();
+            }
         }
     }
 
     public void LoadHistory()
     {
-        //TODO: При загрузке истории, добавить еще одну проверку на стакинг сообщений
-        foreach (var _message in _chatRoom.LoadHistory())
+        var _chatHistory = _chatRoom.LoadHistory();
+        foreach (var _message in _chatHistory)
         {
+            _currentMessages.Add(_message);
             if (_message.user.userId == _chatRoom.hostId)
             {
                 Instantiate(ownMessageGameObject, chatContainer)
