@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEditor.VersionControl;
 using UnityEngine;
@@ -18,7 +19,7 @@ public class SC_ChatManager : MonoBehaviour
     [SerializeField] private GameObject anotherMessageGameObject;
     
     [SerializeField] private Transform chatContainer;
- 
+    
     private void Awake()
     {
         _inputField.onSubmit.AddListener(AddMessage);
@@ -27,15 +28,35 @@ public class SC_ChatManager : MonoBehaviour
     }
     
     private void AddMessage(string messageText)
-    {
+    {  
         if (messageText == string.Empty) return;
+        
+        _inputField.text = string.Empty;
+        
         //Добавление сообщения в хранилище основанное на ScriptableObject
         Message _messageData = _chatRoom.AddMessage(messageText, _chatRoom.GetUser(_chatRoom.hostId));
         //Добавление сообщений в интерфейс
-        Instantiate(ownMessageGameObject, chatContainer)
-            .GetComponent<SC_BubbleMessageView>()
-            .SetData(_messageData);
-        _inputField.text = string.Empty;
+        SC_BubbleMessageView _bubbleMessage = Instantiate(ownMessageGameObject, chatContainer)
+            .GetComponent<SC_BubbleMessageView>();
+        //Проверка на повтор с предыдущим сообщением
+        _bubbleMessage.SetData(_messageData);
+       
+        CheckPreviousMessage(true);
+        
+    }
+
+    private void CheckPreviousMessage(bool isOwnMessage = false)
+    {
+        GameObject previousMessage = chatContainer.Find(_chatRoom.LoadHistory()[_chatRoom.LoadHistory().Count - 2]?.messageId.ToString())?.gameObject;
+        Message previousMessageData = _chatRoom.LoadHistory()[_chatRoom.LoadHistory().Count - 2];
+
+        if (previousMessage == null) return;
+        
+        if (_chatRoom.LoadHistory()?.LastOrDefault()?.user.userId ==
+            previousMessageData.user.userId)
+        {
+            previousMessage.GetComponent<SC_BubbleMessageView>().SetData(previousMessageData, true, isOwnMessage);
+        }
     }
 
     public void LoadHistory()
@@ -47,15 +68,15 @@ public class SC_ChatManager : MonoBehaviour
                 Instantiate(ownMessageGameObject, chatContainer)
                     .GetComponent<SC_BubbleMessageView>()
                     .SetData(_message);
+                CheckPreviousMessage(true);
             }
             else
             {
                 Instantiate(anotherMessageGameObject, chatContainer)
                     .GetComponent<SC_BubbleMessageView>()
                     .SetData(_message);
+                CheckPreviousMessage();
             }
-            
-            
         }
     }
 
