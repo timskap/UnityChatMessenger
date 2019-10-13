@@ -14,16 +14,22 @@ public class SC_ChatManager : MonoBehaviour
 
     [SerializeField] private Button _sendButton;
     [SerializeField] private Button _clearButton;
+    [SerializeField] private Button _doneButton;
 
     [SerializeField] private GameObject ownMessageGameObject;
     [SerializeField] private GameObject anotherMessageGameObject;
     
     [SerializeField] private Transform chatContainer;
+
+    [SerializeField] private GameObject MessagePanelGameObject;
+    [SerializeField] private GameObject RemovePanelGameObject;
     
     private void Awake()
     {
         _inputField.onSubmit.AddListener(AddMessage);
         _sendButton.onClick.AddListener(() => AddMessage(_inputField.text));
+        _clearButton.onClick.AddListener(() => OpenRemovePanel(true));
+        _doneButton.onClick.AddListener(() => OpenRemovePanel(false));
         LoadHistory();
     }
     
@@ -39,10 +45,9 @@ public class SC_ChatManager : MonoBehaviour
         SC_BubbleMessageView _bubbleMessage = Instantiate(ownMessageGameObject, chatContainer)
             .GetComponent<SC_BubbleMessageView>();
         //Проверка на повтор с предыдущим сообщением
-        _bubbleMessage.SetData(_messageData);
+        _bubbleMessage.SetData(_messageData, _chatRoom: _chatRoom);
        
         CheckPreviousMessage(true);
-        
     }
 
     private void CheckPreviousMessage(bool isOwnMessage = false)
@@ -55,34 +60,53 @@ public class SC_ChatManager : MonoBehaviour
         if (_chatRoom.LoadHistory()?.LastOrDefault()?.user.userId ==
             previousMessageData.user.userId)
         {
-            previousMessage.GetComponent<SC_BubbleMessageView>().SetData(previousMessageData, true, isOwnMessage);
+            previousMessage.GetComponent<SC_BubbleMessageView>().SetData(previousMessageData, true, isOwnMessage, _chatRoom);
         }
     }
 
     public void LoadHistory()
     {
+        //TODO: При загрузке истории, добавить еще одну проверку на стакинг сообщений
         foreach (var _message in _chatRoom.LoadHistory())
         {
             if (_message.user.userId == _chatRoom.hostId)
             {
                 Instantiate(ownMessageGameObject, chatContainer)
                     .GetComponent<SC_BubbleMessageView>()
-                    .SetData(_message);
+                    .SetData(_message,  _chatRoom: _chatRoom);
                 CheckPreviousMessage(true);
             }
             else
             {
                 Instantiate(anotherMessageGameObject, chatContainer)
                     .GetComponent<SC_BubbleMessageView>()
-                    .SetData(_message);
+                    .SetData(_message,  _chatRoom: _chatRoom);
                 CheckPreviousMessage();
             }
         }
     }
 
-    public void RemoveMessage(string text)
+    private void OpenRemovePanel(bool isOpen)
     {
-        
+        RemovePanelGameObject.SetActive(isOpen);
+        MessagePanelGameObject.SetActive(!isOpen);
+
+        if (isOpen)
+        {
+            foreach (var _message in _chatRoom.GetOwnMessages())
+            {
+               var messageGameObject = chatContainer.Find(_message.messageId.ToString())?.gameObject;
+               messageGameObject.GetComponent<SC_BubbleMessageView>().ShowRemoveButton(true);
+            }
+        }
+        else
+        {
+            foreach (var _message in _chatRoom.GetOwnMessages())
+            {
+                var messageGameObject = chatContainer.Find(_message.messageId.ToString())?.gameObject;
+                messageGameObject.GetComponent<SC_BubbleMessageView>().ShowRemoveButton(false);
+            }
+        }
     }
 
 }

@@ -17,11 +17,23 @@ public class SC_BubbleMessageView : MonoBehaviour
     [SerializeField] private Sprite backgroundBubbleSprite;
     [SerializeField] private HorizontalLayoutGroup containerHorizontalLayoutGroup;
     [SerializeField] private VerticalLayoutGroup containerVerticalLayoutGroup;
+    [SerializeField] private Button removeButton;
+    
     private int messageId;
     private float minWindowWidth = 600f;
 
-    public void SetData(Message _message, bool isStack = false, bool isOwnMessage = false)
+    private bool Stacking;
+    private bool OwnMessage;
+    
+
+    private void Awake()
     {
+        gameObject.SetActive(false);
+    }
+
+    public void SetData(Message _message, bool _isStack = false, bool isOwnMessage = false, SO_ChatRoom _chatRoom = null)
+    {
+        ShowRemoveButton(false);
         messageText.text = _message.text;
         userNameText.text = _message.user.name;
         DateTime messageTime = Convert.ToDateTime(_message.time);
@@ -29,9 +41,40 @@ public class SC_BubbleMessageView : MonoBehaviour
         messageId = _message.messageId;
         avatar.sprite = _message.user.avatar;
         gameObject.name = messageId.ToString();
+        
+        removeButton?.onClick.AddListener(() =>
+        {
+            _chatRoom.RemoveMessage(_message);
+            DeleteMessage();
+        });
 
-        if (isStack) HideAvatar(isOwnMessage);
+        Stacking = _isStack;
+        OwnMessage = isOwnMessage;
 
+        if (Stacking) HideAvatar(isOwnMessage);
+        
+        gameObject.SetActive(true);
+        
+
+
+    }
+
+    public void ShowRemoveButton(bool isActive)
+    {
+        removeButton?.gameObject.SetActive(isActive);
+
+        if (OwnMessage && Stacking)
+        {
+            containerHorizontalLayoutGroup.padding.right = 0;
+            containerHorizontalLayoutGroup.spacing = 190f;
+        }
+        
+    }
+
+    private void DeleteMessage()
+    {
+        
+        Destroy(gameObject);
     }
 
     private void HideAvatar(bool isOwnMessage)
@@ -41,7 +84,7 @@ public class SC_BubbleMessageView : MonoBehaviour
         
         if (isOwnMessage)
         {
-            containerHorizontalLayoutGroup.padding.right = 154;
+            containerHorizontalLayoutGroup.padding.right = 180;
         }
         else
         {

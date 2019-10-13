@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Fox
   m_EditorClassIdentifier: Assembly-CSharp::UserData
   UserInfo:
-    userId: 1
+    userId: 2
     avatar: {fileID: 21300000, guid: 3c2cb15a7151d46238992770612e7a88, type: 3}
-    name: Fox
+    name: "\u0425\u0438\u0442\u0440\u044B\u0439 \u041B\u0438\u0441"

@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Boris
   m_EditorClassIdentifier: Assembly-CSharp::UserData
   UserInfo:
-    userId: 1337
+    userId: 1
     avatar: {fileID: 21300000, guid: b412934d106e04c0c93339994502a8ef, type: 3}
-    name: Boris
+    name: Velikolopsky Boris

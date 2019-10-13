@@ -102,6 +102,7 @@ MonoBehaviour:
     type: 3}
   containerHorizontalLayoutGroup: {fileID: 6455918865689566579}
   containerVerticalLayoutGroup: {fileID: 8493431598842772566}
+  removeButton: {fileID: 0}
 --- !u!1 &1192426124951315228
 GameObject:
   m_ObjectHideFlags: 0
@@ -243,7 +244,7 @@ MonoBehaviour:
     spaceCount: 4
     wordCount: 5
     linkCount: 0
-    lineCount: 2
+    lineCount: 1
     pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
@@ -737,8 +738,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4294822526
+  m_fontColor: {r: 0.49411765, g: 0.7921569, b: 0.99215686, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

@@ -28,13 +28,20 @@ public class SO_ChatRoom : ScriptableObject
 
     public User GetUser(int _id)
     {
-        var user = UsersData.Find(x => x.UserInfo.userId == _id);
+        SO_UserData user = UsersData.Find(x => x.UserInfo.userId == _id);
         return user.UserInfo;
     }
 
-    public void RemoveMessage(int _messageId)
+    public void RemoveMessage(Message _message)
     {
-        
+      _messages.Remove(_message);
+    }
+    
+    public List<Message> GetOwnMessages()
+    {
+        List<Message> ownMessages =  _messages.FindAll(x => x.user.userId == hostId);
+
+        return ownMessages;
     }
 
     public List<Message> LoadHistory()
