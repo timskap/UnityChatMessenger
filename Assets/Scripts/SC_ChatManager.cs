@@ -43,21 +43,15 @@ public class SC_ChatManager : MonoBehaviour
     private void AddMessage(string messageText)
     {  
         if (messageText == string.Empty) return;
-        
         _inputField.text = string.Empty;
-        
-        
+
         //Добавление сообщения в хранилище основанное на ScriptableObject
         Message _messageData = _chatRoom.AddMessage(messageText, _chatRoom.GetRandomUser());
-        //Добавление сообщений в интерфейс
-        SC_BubbleMessageView _bubbleMessage = Instantiate(ownMessageGameObject, chatContainer)
-            .GetComponent<SC_BubbleMessageView>();
-
-
         _currentMessages.Add(_messageData);
         DataToMessageBubble(_messageData);
         //Проверка на автора предыдущего с предыдущения
         CheckPreviousMessage(true);
+        //Скролл к последнему сообщению
         chatContainer.transform.GetComponent<RectTransform>().position = new Vector3(0, 234, 0);
     }
 
