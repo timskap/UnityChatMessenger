@@ -52,7 +52,7 @@ public class SC_ChatManager : MonoBehaviour
         //Проверка на автора предыдущего с предыдущения
         CheckPreviousMessage(true);
         //Скролл к последнему сообщению
-        chatContainer.transform.GetComponent<RectTransform>().position = new Vector3(0, 234, 0);
+        chatContainer.transform.GetComponent<RectTransform>().position = new Vector3(0, 999, 0);
     }
 
     private void CheckPreviousMessage(bool isOwnMessage = false)
