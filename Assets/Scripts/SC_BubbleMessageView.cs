@@ -11,11 +11,14 @@ public class SC_BubbleMessageView : MonoBehaviour
     [SerializeField] private TMP_Text messageText;
     [SerializeField] private TMP_Text userNameText;
     [SerializeField] private TMP_Text timeText;
+    
     [SerializeField] private Image avatar;
     [SerializeField] private Image backgroundBubbleImage;
     [SerializeField] private Sprite backgroundBubbleWithoutAvatarSprite;
+    
     [SerializeField] private HorizontalLayoutGroup containerHorizontalLayoutGroup;
     [SerializeField] private VerticalLayoutGroup containerVerticalLayoutGroup;
+    
     [SerializeField] private Button removeButton;
     
     private int messageId;
@@ -29,13 +32,24 @@ public class SC_BubbleMessageView : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
+    
+    /// <summary>
+    /// Заполнение баббла с контейнером
+    /// </summary>
+    /// <param name="_message">Само сообщение и информация о нем</param>
+    /// <param name="_isStack">Стакается ли сообщение</param>
+    /// <param name="isOwnMessage">Принадлежит ли сообщение вам</param>
+    /// <param name="_chatRoom">Ссылка на комнату для удаления сообщения</param>
 
     public void SetData(Message _message, bool _isStack = false, bool isOwnMessage = false, SO_ChatRoom _chatRoom = null)
     {
+        DateTime messageTime = Convert.ToDateTime(_message.time);
+        
         ShowRemoveButton(false);
+        
+        //Заполнение контейнера данными
         messageText.text = _message.text;
         userNameText.text = _message.user.name;
-        DateTime messageTime = Convert.ToDateTime(_message.time);
         timeText.text = messageTime.ToString("HH:mm:ss");
         messageId = _message.messageId;
         avatar.sprite = _message.user.avatar;
@@ -62,12 +76,24 @@ public class SC_BubbleMessageView : MonoBehaviour
     {
         removeButton?.gameObject.SetActive(isActive);
 
-        if (OwnMessage && Stacking)
-        {
-            containerHorizontalLayoutGroup.padding.right = 0;
-            containerHorizontalLayoutGroup.spacing = 190f;
-        }
-        
+
+
+            if (OwnMessage && Stacking)
+            {
+                if (isActive)
+                {
+                    containerHorizontalLayoutGroup.padding.right = 0;
+                }
+                else
+                {
+                    containerHorizontalLayoutGroup.padding.right = 190;
+                }
+
+                containerHorizontalLayoutGroup.spacing = 190f;
+            }
+
+
+
     }
 
     private void DeleteMessage()

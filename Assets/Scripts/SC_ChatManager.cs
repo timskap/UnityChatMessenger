@@ -23,7 +23,6 @@ public class SC_ChatManager : MonoBehaviour
     [SerializeField] private GameObject MessagePanelGameObject;
     [SerializeField] private GameObject RemovePanelGameObject;
 
-    [SerializeField] private bool isSlowLoad;
     private List<Message> _currentMessages;
     
     private void Awake()
@@ -33,15 +32,13 @@ public class SC_ChatManager : MonoBehaviour
         _sendButton.onClick.AddListener(() => AddMessage(_inputField.text));
         _clearButton.onClick.AddListener(() => OpenRemovePanel(true));
         _doneButton.onClick.AddListener(() => OpenRemovePanel(false));
-        if (isSlowLoad)
-        {
-            StartCoroutine(SlowLoadHistory());
-        }
-        else
-        {
-            LoadHistory();
-        }
+        LoadHistory();
     }
+    
+    /// <summary>
+    /// Добавление сообщения в Canvas
+    /// </summary>
+    /// <param name="messageText"></param>
     
     private void AddMessage(string messageText)
     {  
@@ -51,14 +48,15 @@ public class SC_ChatManager : MonoBehaviour
         
         
         //Добавление сообщения в хранилище основанное на ScriptableObject
-        Message _messageData = _chatRoom.AddMessage(messageText, _chatRoom.GetUser(_chatRoom.hostId));
+        Message _messageData = _chatRoom.AddMessage(messageText, _chatRoom.GetRandomUser());
         //Добавление сообщений в интерфейс
         SC_BubbleMessageView _bubbleMessage = Instantiate(ownMessageGameObject, chatContainer)
             .GetComponent<SC_BubbleMessageView>();
 
-        _bubbleMessage.SetData(_messageData, _chatRoom: _chatRoom);
+
         _currentMessages.Add(_messageData);
-        //Проверка на повтор с предыдущим сообщением
+        DataToMessageBubble(_messageData);
+        //Проверка на автора предыдущего с предыдущения
         CheckPreviousMessage(true);
         chatContainer.transform.GetComponent<RectTransform>().position = new Vector3(0, 234, 0);
     }
@@ -78,54 +76,41 @@ public class SC_ChatManager : MonoBehaviour
         }
        
     }
-
-    IEnumerator SlowLoadHistory()
-    {   
-        //TODO: При загрузке истории, добавить еще одну проверку на стакинг сообщений
-        var _chatHistory = _chatRoom.LoadHistory();
-        foreach (var _message in _chatHistory)
-        {
-            _currentMessages.Add(_message);
-            yield return new WaitForSeconds(Random.Range(1f, 3f));
-            if (_message.user.userId == _chatRoom.hostId)
-            {
-                Instantiate(ownMessageGameObject, chatContainer)
-                    .GetComponent<SC_BubbleMessageView>()
-                    .SetData(_message,  _chatRoom: _chatRoom);
-                CheckPreviousMessage(true);
-            }
-            else
-            {
-                Instantiate(anotherMessageGameObject, chatContainer)
-                    .GetComponent<SC_BubbleMessageView>()
-                    .SetData(_message,  _chatRoom: _chatRoom);
-                CheckPreviousMessage();
-            }
-        }
-    }
-
+    
     public void LoadHistory()
     {
-        var _chatHistory = _chatRoom.LoadHistory();
+        //Загрузка сообщений из истории
+        List<Message> _chatHistory = _chatRoom.LoadHistory();
         foreach (var _message in _chatHistory)
         {
             _currentMessages.Add(_message);
-            if (_message.user.userId == _chatRoom.hostId)
-            {
-                Instantiate(ownMessageGameObject, chatContainer)
-                    .GetComponent<SC_BubbleMessageView>()
-                    .SetData(_message,  _chatRoom: _chatRoom);
-                CheckPreviousMessage(true);
-            }
-            else
-            {
-                Instantiate(anotherMessageGameObject, chatContainer)
-                    .GetComponent<SC_BubbleMessageView>()
-                    .SetData(_message,  _chatRoom: _chatRoom);
-                CheckPreviousMessage();
-            }
+            DataToMessageBubble(_message);
+
         }
     }
+
+    public void DataToMessageBubble(Message _message)
+    {
+        if (_message.user.userId == _chatRoom.hostId)
+        {
+            Instantiate(ownMessageGameObject, chatContainer)
+                .GetComponent<SC_BubbleMessageView>()
+                .SetData(_message,  _chatRoom: _chatRoom);
+            CheckPreviousMessage(true);
+        }
+        else
+        {
+            Instantiate(anotherMessageGameObject, chatContainer)
+                .GetComponent<SC_BubbleMessageView>()
+                .SetData(_message,  _chatRoom: _chatRoom);
+            CheckPreviousMessage();
+        }
+    } 
+    
+    /// <summary>
+    /// Открытие и закрытие панели с удалением сообщений
+    /// </summary>
+    /// <param name="isOpen"></param>
 
     private void OpenRemovePanel(bool isOpen)
     {
