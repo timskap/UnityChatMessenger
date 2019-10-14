@@ -49,6 +49,7 @@ public class SC_ChatManager : MonoBehaviour
         
         _inputField.text = string.Empty;
         
+        
         //Добавление сообщения в хранилище основанное на ScriptableObject
         Message _messageData = _chatRoom.AddMessage(messageText, _chatRoom.GetUser(_chatRoom.hostId));
         //Добавление сообщений в интерфейс
@@ -59,6 +60,7 @@ public class SC_ChatManager : MonoBehaviour
         _currentMessages.Add(_messageData);
         //Проверка на повтор с предыдущим сообщением
         CheckPreviousMessage(true);
+        chatContainer.transform.GetComponent<RectTransform>().position = new Vector3(0, 234, 0);
     }
 
     private void CheckPreviousMessage(bool isOwnMessage = false)
@@ -74,6 +76,7 @@ public class SC_ChatManager : MonoBehaviour
         {
             previousMessage.GetComponent<SC_BubbleMessageView>().SetData(previousMessageData, true, isOwnMessage: isOwnMessage, _chatRoom);
         }
+       
     }
 
     IEnumerator SlowLoadHistory()
@@ -128,6 +131,12 @@ public class SC_ChatManager : MonoBehaviour
     {
         RemovePanelGameObject.SetActive(isOpen);
         MessagePanelGameObject.SetActive(!isOpen);
+        
+        //Workaround для ререндеринга Layout
+        var _verticalLayoutGroup = chatContainer.GetComponent<VerticalLayoutGroup>();
+        _verticalLayoutGroup.spacing = 55;
+        _verticalLayoutGroup.spacing = 54;
+        
 
         if (isOpen)
         {
