@@ -75,9 +75,6 @@ public class SC_BubbleMessageView : MonoBehaviour
     public void ShowRemoveButton(bool isActive)
     {
         removeButton?.gameObject.SetActive(isActive);
-
-
-
             if (OwnMessage && Stacking)
             {
                 if (isActive)
@@ -88,17 +85,12 @@ public class SC_BubbleMessageView : MonoBehaviour
                 {
                     containerHorizontalLayoutGroup.padding.right = 190;
                 }
-
                 containerHorizontalLayoutGroup.spacing = 190f;
             }
-
-
-
     }
 
     private void DeleteMessage()
     {
-        
         Destroy(gameObject);
     }
 
